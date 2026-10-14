@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การ์ดราชาศัพท์ออนไลน์</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* =========================================================
+     ตัวแปรสี (Design Tokens) — ธีมไทยโบราณ: ทอง / แดงเลือดหมู / น้ำเงินเข้ม / ครีม
+     สลับโหมดมืด-สว่างด้วย attribute data-theme บน <html>
+     ========================================================= */
+  :root{
+    --bg:#faf6ec;
+    --surface:#ffffff;
+    --surface-alt:#f2e9d2;
+    --text:#2a1c12;
+    --text-soft:#6b5a45;
+    --maroon:#7a1f2b;
+    --maroon-dark:#5a141e;
+    --maroon-soft:#f3dde0;
+    --gold:#a9781f;
+    --gold-soft:#f0dfae;
+    --navy:#1f2b4d;
+    --navy-soft:#e7ebf5;
+    --success:#2e7d4f;
+    --success-soft:#dff3e6;
+    --error:#b3261e;
+    --error-soft:#fbe2e0;
+    --radius:16px;
+    --shadow:0 10px 30px -12px rgba(60,30,15,.28);
+    --focus-ring:0 0 0 3px #a9781f66;
+  }
+  [data-theme="dark"]{
+    --bg:#12141f;
+    --surface:#1d2133;
+    --surface-alt:#262b42;
+    --text:#f4ecd8;
+    --text-soft:#c9bfa6;
+    --maroon:#e08a94;
+    --maroon-dark:#c9525f;
+    --maroon-soft:#3a2229;
+    --gold:#e3bd66;
+    --gold-soft:#3a3220;
+    --navy:#9fb2e6;
+    --navy-soft:#242c48;
+    --success:#6bdd9c;
+    --success-soft:#1c3a2b;
+    --error:#ff8a80;
+    --error-soft:#3e2020;
+    --shadow:0 10px 30px -12px rgba(0,0,0,.6);
+    --focus-ring:0 0 0 3px #e3bd6688;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; min-height:100vh;
+    background:var(--bg); color:var(--text);
+    font-family:'Sarabun',sans-serif;
+    font-size:16px; line-height:1.6;
+    transition:background .25s ease, color .25s ease;
+  }
+  h1,h2,h3,.mitr{font-family:'Mitr','Sarabun',sans-serif;}
+  button{font-family:inherit; font-size:inherit; cursor:pointer;}
+  input{font-family:inherit; font-size:inherit;}
+
+  /* focus visible ทั่วทั้งแอป เพื่อรองรับการเล่นด้วยคีย์บอร์ด */
+  a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible{
+    outline:none; box-shadow:var(--focus-ring);
+    border-radius:8px;
+  }
+
+  .wrap{max-width:980px; margin:0 auto; padding:0 16px 60px;}
+
+  /* ---------- header ---------- */
+  .app-header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:18px 16px; max-width:980px; margin:0 auto;
+    flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .emblem{
+    width:44px; height:44px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold));
+    display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+    box-shadow:var(--shadow);
+    flex-shrink:0;
+  }
+  .brand h1{font-size:clamp(1.05rem,2.6vw,1.5rem); margin:0; color:var(--maroon-dark);}
+  [data-theme="dark"] .brand h1{color:var(--maroon);}
+  .brand p{margin:0; font-size:.8rem; color:var(--text-soft);}
+
+  .theme-toggle{
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface); border:1.5px solid var(--gold-soft);
+    border-radius:999px; padding:8px 16px;
+    color:var(--text); box-shadow:var(--shadow);
+  }
+  .theme-toggle:hover{border-color:var(--gold);}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex; gap:8px; flex-wrap:wrap;
+    max-width:980px; margin:0 auto; padding:0 16px 14px;
+  }
+  .tab-btn{
+    flex:1 1 auto; min-width:120px;
+    background:var(--surface); border:1.5px solid transparent;
+    color:var(--text-soft); border-radius:12px; padding:12px 10px;
+    font-weight:600; font-family:'Mitr';
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    box-shadow:var(--shadow); transition:transform .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .tab-btn .ico{font-size:1.3rem;}
+  .tab-btn:hover{transform:translateY(-2px);}
+  .tab-btn[aria-selected="true"]{
+    color:var(--maroon-dark); border-color:var(--gold);
+    background:linear-gradient(180deg, var(--gold-soft), var(--surface));
+  }
+  [data-theme="dark"] .tab-btn[aria-selected="true"]{color:var(--maroon);}
+
+  /* ---------- filter bar ---------- */
+  .filter-bar{
+    background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:16px; margin-bottom:18px;
+  }
+  .search-row{display:flex; gap:8px; margin-bottom:12px;}
+  .search-row input{
+    flex:1; padding:11px 14px; border-radius:10px;
+    border:1.5px solid var(--surface-alt); background:var(--bg); color:var(--text);
+  }
+  .search-row input::placeholder{color:var(--text-soft);}
+  .search-row button{
+    background:var(--surface-alt); border:1.5px solid var(--surface-alt);
+    border-radius:10px; padding:0 16px; color:var(--text-soft); font-weight:600;
+  }
+  .filter-groups{display:flex; flex-wrap:wrap; gap:18px;}
+  .filter-group{display:flex; flex-direction:column; gap:6px;}
+  .filter-group .glabel{font-size:.78rem; color:var(--text-soft); font-weight:600;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{
+    border:1.5px solid var(--surface-alt); background:var(--surface);
+    border-radius:999px; padding:6px 13px; font-size:.85rem; color:var(--text-soft);
+    font-weight:500; transition:all .15s ease;
+  }
+  .chip[aria-pressed="true"]{
+    background:var(--maroon); border-color:var(--maroon); color:#fff;
+  }
+  .pool-count{
+    margin-top:12px; font-size:.82rem; color:var(--text-soft);
+    display:flex; align-items:center; gap:6px;
+  }
+  .pool-count strong{color:var(--maroon-dark);}
+  [data-theme="dark"] .pool-count strong{color:var(--maroon);}
+
+  /* ---------- generic panel/card look ---------- */
+  .panel{
+    background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:22px; text-align:center;
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:.72rem; font-weight:600; padding:4px 11px; border-radius:999px;
+    background:var(--navy-soft); color:var(--navy);
+  }
+  .badge.gold{background:var(--gold-soft); color:var(--gold);}
+  .badge-row{display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;}
+
+  .btn{
+    border:none; border-radius:12px; padding:11px 22px; font-weight:600; font-family:'Mitr';
+    background:var(--maroon); color:#fff; box-shadow:var(--shadow);
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+  .btn.gold{background:var(--gold); color:#2a1c12;}
+  .btn.ghost{background:var(--surface); color:var(--text); border:1.5px solid var(--surface-alt); box-shadow:none;}
+
+  .hidden{display:none !important;}
+
+  /* =====================================================
+     โหมดการ์ดพลิก (Flashcard)
+     ===================================================== */
+  .fc-stage{display:flex; flex-direction:column; align-items:center; gap:18px;}
+  .flashcard{
+    width:100%; max-width:440px; height:280px;
+    perspective:1400px; cursor:pointer;
+  }
+  .flashcard-inner{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .fc-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:20px; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px; gap:10px;
+  }
+  .fc-front{
+    background:linear-gradient(160deg, var(--surface), var(--surface-alt));
+    border:2px solid var(--gold-soft);
+  }
+  .fc-back{
+    background:linear-gradient(160deg, var(--maroon), var(--maroon-dark));
+    color:#fff; transform:rotateY(180deg);
+    border:2px solid var(--gold);
+  }
+  .fc-front .word{font-family:'Mitr'; font-size:clamp(1.6rem,5vw,2.3rem); font-weight:700; color:var(--text);}
+  .fc-back .word{font-family:'Mitr'; font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; color:var(--gold-soft);}
+  .fc-hint{font-size:.78rem; color:var(--text-soft);}
+  .fc-back .fc-hint{color:#f3dde0cc;}
+  .fc-desc{font-size:.92rem; line-height:1.65; max-width:360px;}
+
+  .fc-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .fc-progress{font-size:.85rem; color:var(--text-soft); min-width:70px; text-align:center;}
+
+  /* =====================================================
+     โหมดทดสอบ (Quiz)
+     ===================================================== */
+  .quiz-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;}
+  .quiz-question{font-family:'Mitr'; font-size:clamp(1.05rem,3vw,1.4rem); margin:6px 0 20px; color:var(--maroon-dark);}
+  [data-theme="dark"] .quiz-question{color:var(--maroon);}
+  .quiz-options{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:12px; margin-bottom:14px;
+  }
+  .opt-btn{
+    background:var(--surface); border:1.5px solid var(--surface-alt);
+    border-radius:12px; padding:14px 16px; text-align:right; color:var(--text);
+    font-size:1rem; box-shadow:var(--shadow);
+  }
+  .opt-btn:hover:not(:disabled){border-color:var(--gold);}
+  .opt-btn.correct{background:var(--success-soft); border-color:var(--success); color:var(--success);}
+  .opt-btn.wrong{background:var(--error-soft); border-color:var(--error); color:var(--error);}
+  .opt-btn:disabled{cursor:default;}
+  .quiz-feedback{min-height:26px; font-weight:600; margin-bottom:10px;}
+  .quiz-feedback.correct{color:var(--success);}
+  .quiz-feedback.wrong{color:var(--error);}
+  .quiz-score-chip{font-weight:700; color:var(--gold);}
+
+  .quiz-result-score{font-family:'Mitr'; font-size:clamp(2rem,7vw,3rem); color:var(--maroon-dark); margin:6px 0;}
+  [data-theme="dark"] .quiz-result-score{color:var(--maroon);}
+  .review-list{text-align:right; margin-top:16px; display:flex; flex-direction:column; gap:8px;}
+  .review-item{
+    display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    padding:10px 14px; border-radius:10px; background:var(--surface-alt); font-size:.88rem;
+  }
+  .review-item.bad{background:var(--error-soft);}
+
+  select.setup-select{
+    padding:9px 12px; border-radius:10px; border:1.5px solid var(--surface-alt);
+    background:var(--bg); color:var(--text); margin:0 8px;
+  }
+
+  /* =====================================================
+     โหมดจับคู่ (Matching)
+     ===================================================== */
+  .match-timer{
+    font-family:'Mitr'; font-size:1.3rem; color:var(--maroon-dark); font-weight:700;
+  }
+  [data-theme="dark"] .match-timer{color:var(--maroon);}
+  .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-top:16px;}
+  .match-col{display:flex; flex-direction:column; gap:8px;}
+  .match-tile{
+    background:var(--surface); border:1.5px solid var(--surface-alt);
+    border-radius:10px; padding:12px 10px; font-size:.92rem; color:var(--text);
+    box-shadow:var(--shadow); text-align:center; min-height:48px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .match-tile:hover:not(:disabled){border-color:var(--gold);}
+  .match-tile.selected{border-color:var(--navy); background:var(--navy-soft);}
+  .match-tile.matched{background:var(--success-soft); border-color:var(--success); color:var(--success); opacity:.75;}
+  .match-tile.wrong{background:var(--error-soft); border-color:var(--error); animation:shake .35s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
+  .match-tile:disabled{cursor:default;}
+
+  .celebrate{animation:popIn .4s ease;}
+  @keyframes popIn{0%{transform:scale(.8); opacity:0;} 100%{transform:scale(1); opacity:1;}}
+
+  /* =====================================================
+     สถิติ (Stats)
+     ===================================================== */
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:18px;}
+  .stat-card{background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; text-align:center;}
+  .stat-num{font-family:'Mitr'; font-size:1.8rem; color:var(--maroon-dark); font-weight:700;}
+  [data-theme="dark"] .stat-num{color:var(--maroon);}
+  .stat-label{font-size:.82rem; color:var(--text-soft); margin-top:4px;}
+
+  footer{text-align:center; font-size:.78rem; color:var(--text-soft); padding:20px 16px;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:560px){
+    .match-grid{gap:8px 8px;}
+    .match-tile{font-size:.82rem; padding:10px 6px;}
+    .tab-btn{min-width:90px; font-size:.85rem;}
+    .flashcard{height:250px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="emblem" aria-hidden="true">👑</div>
+    <div>
+      <h1>การ์ดราชาศัพท์ออนไลน์</h1>
+      <p>สื่อฝึกราชาศัพท์แบบโต้ตอบ • ภาษาไทย</p>
+    </div>
+  </div>
+  <button class="theme-toggle" id="themeToggle" aria-pressed="false">
+    <span id="themeIcon" aria-hidden="true">🌙</span>
+    <span id="themeLabel">โหมดมืด</span>
+  </button>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="เลือกโหมดการฝึก">
+  <button class="tab-btn" role="tab" data-mode="flashcard" aria-selected="true">
+    <span class="ico" aria-hidden="true">🎴</span>การ์ดพลิก
+  </button>
+  <button class="tab-btn" role="tab" data-mode="quiz" aria-selected="false">
+    <span class="ico" aria-hidden="true">📝</span>แบบทดสอบ
+  </button>
+  <button class="tab-btn" role="tab" data-mode="match" aria-selected="false">
+    <span class="ico" aria-hidden="true">🧩</span>จับคู่คำ
+  </button>
+  <button class="tab-btn" role="tab" data-mode="stats" aria-selected="false">
+    <span class="ico" aria-hidden="true">📊</span>สถิติของฉัน
+  </button>
+</nav>
+
+<main class="wrap">
+
+  <!-- ================= แถบตัวกรอง + ค้นหา (ใช้ร่วมกับทุกโหมดฝึก) ================= -->
+  <section class="filter-bar" id="filterBar">
+    <div class="search-row">
+      <input type="search" id="searchInput" placeholder="ค้นหาคำสามัญหรือคำราชาศัพท์..." aria-label="ค้นหาคำศัพท์">
+      <button id="clearSearchBtn" type="button">ล้าง</button>
+    </div>
+    <div class="filter-groups">
+      <div class="filter-group">
+        <span class="glabel">หมวดหมู่</span>
+        <div class="chip-row" id="categoryChips"></div>
+      </div>
+      <div class="filter-group">
+        <span class="glabel">ระดับชั้น</span>
+        <div class="chip-row" id="levelChips"></div>
+      </div>
+    </div>
+    <div class="pool-count" id="poolCount" aria-live="polite"></div>
+  </section>
+
+  <!-- ================= โหมดการ์ดพลิก ================= -->
+  <section id="view-flashcard" data-view>
+    <div class="fc-stage">
+      <div id="fcEmpty" class="panel hidden">ไม่พบคำศัพท์ตามเงื่อนไขตัวกรอง ลองปรับตัวกรองหรือคำค้นหาใหม่</div>
+      <div class="flashcard" id="flashcard" tabindex="0" role="button"
+           aria-label="การ์ดคำศัพท์ กดเพื่อพลิกดูคำราชาศัพท์">
+        <div class="flashcard-inner" id="flashcardInner">
+          <div class="fc-face fc-front">
+            <div class="badge-row" id="fcFrontBadges"></div>
+            <div class="word" id="fcFrontWord"></div>
+            <div class="fc-hint">🔎 คลิกหรือกด Enter เพื่อพลิกดูคำราชาศัพท์</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="badge-row" id="fcBackBadges"></div>
+            <div class="word" id="fcBackWord"></div>
+            <p class="fc-desc" id="fcBackDesc"></p>
+          </div>
+        </div>
+      </div>
+      <div class="fc-controls">
+        <button class="btn ghost" id="fcPrevBtn">← ก่อนหน้า</button>
+        <span class="fc-progress" id="fcProgress">1/1</span>
+        <button class="btn ghost" id="fcShuffleBtn">🔀 สุ่มลำดับ</button>
+        <button class="btn" id="fcNextBtn">ถัดไป →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= โหมดแบบทดสอบ ================= -->
+  <section id="view-quiz" class="hidden" data-view>
+    <div class="panel" id="quizSetup">
+      <h2 class="mitr">📝 เริ่มแบบทดสอบ</h2>
+      <p style="color:var(--text-soft)">เลือกคำราชาศัพท์ที่ถูกต้องจากตัวเลือก 4 ข้อ ตามคำศัพท์ที่กรองไว้ด้านบน</p>
+      <p>จำนวนข้อ:
+        <select class="setup-select" id="quizCountSelect"></select>
+      </p>
+      <p id="quizWarning" class="hidden" style="color:var(--error); font-size:.85rem;">
+        ต้องมีคำศัพท์อย่างน้อย 4 คำตามเงื่อนไขตัวกรองปัจจุบัน กรุณาขยายตัวกรองก่อนเริ่ม
+      </p>
+      <button class="btn" id="quizStartBtn">เริ่มทำแบบทดสอบ</button>
+    </div>
+
+    <div class="panel hidden" id="quizPlay">
+      <div class="quiz-head">
+        <span>ข้อที่ <strong id="quizIndex">1</strong>/<span id="quizTotal">10</span></span>
+        <span>คะแนน: <span class="quiz-score-chip" id="quizScore">0</span></span>
+      </div>
+      <h3 class="quiz-question" id="quizQuestion"></h3>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback" aria-live="polite"></div>
+      <button class="btn gold hidden" id="quizNextBtn">ข้อถัดไป →</button>
+    </div>
+
+    <div class="panel hidden" id="quizResult">
+      <h2 class="mitr">🎉 สรุปผลแบบทดสอบ</h2>
+      <div class="quiz-result-score" id="quizResultScore">0/0</div>
+      <p id="quizResultMsg" style="color:var(--text-soft)"></p>
+      <div class="review-list" id="quizReviewList"></div>
+      <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn" id="quizRetryBtn">ทำอีกครั้ง</button>
+        <button class="btn ghost" id="quizBackBtn">กลับหน้าตั้งค่า</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= โหมดจับคู่คำ ================= -->
+  <section id="view-match" class="hidden" data-view>
+    <div class="panel" id="matchSetup">
+      <h2 class="mitr">🧩 เกมจับคู่คำศัพท์</h2>
+      <p style="color:var(--text-soft)">จับเวลา! คลิกคำสามัญและคำราชาศัพท์ที่คู่กันให้ครบทุกคู่</p>
+      <p>จำนวนคู่:
+        <select class="setup-select" id="matchCountSelect"></select>
+      </p>
+      <p id="matchWarning" class="hidden" style="color:var(--error); font-size:.85rem;">
+        ต้องมีคำศัพท์อย่างน้อย 4 คำตามเงื่อนไขตัวกรองปัจจุบัน กรุณาขยายตัวกรองก่อนเริ่ม
+      </p>
+      <button class="btn" id="matchStartBtn">เริ่มเกม</button>
+    </div>
+
+    <div class="panel hidden" id="matchPlay">
+      <div class="quiz-head">
+        <span>⏱ <span class="match-timer" id="matchTimer">00:00</span></span>
+        <span id="matchProgress" style="color:var(--text-soft); font-size:.85rem;"></span>
+      </div>
+      <div class="match-grid" id="matchGrid"></div>
+    </div>
+
+    <div class="panel hidden celebrate" id="matchDone">
+      <h2 class="mitr">🎉 เก่งมาก!</h2>
+      <p>จับคู่ครบทุกคำแล้วใช้เวลา <strong id="matchDoneTime">00:00</strong></p>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn" id="matchAgainBtn">เล่นอีกครั้ง</button>
+        <button class="btn ghost" id="matchBackBtn">กลับหน้าตั้งค่า</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= สถิติ ================= -->
+  <section id="view-stats" class="hidden" data-view>
+    <div class="panel">
+      <h2 class="mitr">📊 สถิติของฉัน</h2>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="statSeen">0</div>
+          <div class="stat-label">คำที่เคยพลิกดูแล้ว (จากทั้งหมด <span id="statTotalWords">0</span> คำ)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statQuizCount">0</div>
+          <div class="stat-label">ครั้งที่ทำแบบทดสอบ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statQuizAvg">0%</div>
+          <div class="stat-label">คะแนนเฉลี่ยแบบทดสอบ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statMatchBest">-</div>
+          <div class="stat-label">เวลาที่ดีที่สุดในเกมจับคู่</div>
+        </div>
+      </div>
+      <button class="btn ghost" id="resetStatsBtn">🗑️ ล้างสถิติทั้งหมด</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  ทำขึ้นเพื่อการศึกษาวิชาภาษาไทย เรื่องราชาศัพท์ • ข้อมูลคำศัพท์แก้ไข/เพิ่มเติมได้ในซอร์สโค้ด (ดูคอมเมนต์ "ฐานข้อมูลคำศัพท์")
+</footer>
+
+<script>
+/* =============================================================
+   ฐานข้อมูลคำศัพท์ (VOCAB_DATA)
+   -------------------------------------------------------------
+   ครูผู้สอนสามารถเพิ่ม/แก้ไข/ลบคำศัพท์ได้อิสระในอาร์เรย์นี้
+   โครงสร้างแต่ละคำ:
+     id       : เลขกำกับ (ไม่ซ้ำกัน)
+     common   : คำสามัญ
+     royal    : คำราชาศัพท์
+     category : หมวดหมู่ -> 'body' (ร่างกาย) | 'verb' (กริยา/การกระทำ)
+                | 'item' (เครื่องใช้ส่วนพระองค์) | 'family' (ญาติ/ครอบครัว)
+     level    : ระดับชั้น -> 'king' (พระมหากษัตริย์/พระราชินี)
+                | 'high' (พระบรมวงศานุวงศ์ชั้นสูง เช่น สมเด็จเจ้าฟ้า/พระองค์เจ้า)
+                | 'minor' (พระอนุวงศ์ เช่น หม่อมเจ้า)
+     desc     : คำอธิบายสั้น ๆ พร้อมตัวอย่างประโยค
+   หากเพิ่มคำใหม่ กรุณาตั้ง id ให้ไม่ซ้ำกับของเดิม (แนะนำให้ไล่เลขต่อจากตัวสุดท้าย)
+   ============================================================= */
+const VOCAB_DATA = [
+  // ---------- หมวดร่างกาย (body) ----------
+  {id:1, common:'หัว', royal:'พระเศียร', category:'body', level:'king', desc:'ส่วนศีรษะของพระมหากษัตริย์/พระราชวงศ์ เช่น "พระบาทสมเด็จพระเจ้าอยู่หัวทรงสวมพระมาลาบนพระเศียร"'},
+  {id:2, common:'หน้า', royal:'พระพักตร์', category:'body', level:'king', desc:'ใบหน้า เช่น "สมเด็จพระราชินีทรงมีพระพักตร์ที่งดงามและอ่อนโยน"'},
+  {id:3, common:'ผม', royal:'พระเกศา', category:'body', level:'king', desc:'เส้นผมบนศีรษะ เช่น "ช่างทรงถวายการตัดพระเกศาแด่พระบาทสมเด็จพระเจ้าอยู่หัว"'},
+  {id:4, common:'ตา', royal:'พระเนตร', category:'body', level:'king', desc:'ดวงตา เช่น "พระองค์ทรงเบิกพระเนตรทอดพระเนตรไปยังฝูงชน"'},
+  {id:5, common:'หู', royal:'พระกรรณ', category:'body', level:'king', desc:'ใบหู เช่น "เสียงเพลงชาติดังกึกก้องเข้าสู่พระกรรณของพระองค์"'},
+  {id:6, common:'จมูก', royal:'พระนาสิก', category:'body', level:'high', desc:'จมูก เช่น "สมเด็จเจ้าฟ้าฯ ทรงได้กลิ่นดอกไม้หอมผ่านพระนาสิก"'},
+  {id:7, common:'ปาก', royal:'พระโอษฐ์', category:'body', level:'king', desc:'ริมฝีปากหรือปาก เช่น "รอยแย้มพระสรวลปรากฏที่มุมพระโอษฐ์"'},
+  {id:8, common:'ฟัน', royal:'พระทนต์', category:'body', level:'high', desc:'ฟัน เช่น "ทันตแพทย์ประจำพระองค์ถวายการตรวจพระทนต์"'},
+  {id:9, common:'มือ', royal:'พระหัตถ์', category:'body', level:'king', desc:'มือ เช่น "พระองค์ทรงยื่นพระหัตถ์ให้ประชาชนได้สัมผัส"'},
+  {id:10, common:'เท้า', royal:'พระบาท', category:'body', level:'king', desc:'เท้า เช่น "ประชาชนหมอบกราบแทบพระบาทด้วยความจงรักภักดี"'},
+  {id:11, common:'ท้อง', royal:'พระอุทร', category:'body', level:'high', desc:'ช่องท้อง เช่น "พระองค์ทรงมีอาการปวดพระอุทรเล็กน้อย"'},
+  {id:12, common:'หัวใจ', royal:'พระหทัย', category:'body', level:'king', desc:'หัวใจ เช่น "ความห่วงใยราษฎรฝังแน่นอยู่ในพระหทัยของพระองค์เสมอมา"'},
+  {id:13, common:'เลือด', royal:'พระโลหิต', category:'body', level:'king', desc:'เลือด เช่น "แพทย์หลวงถวายการเจาะพระโลหิตเพื่อตรวจสุขภาพประจำปี"'},
+  {id:14, common:'เหงื่อ', royal:'พระเสโท', category:'body', level:'high', desc:'เหงื่อ เช่น "พระเสโทหยดเป็นเม็ดขณะทรงพระดำเนินตรวจราชการ"'},
+
+  // ---------- หมวดกริยา/การกระทำ (verb) ----------
+  {id:15, common:'กิน', royal:'เสวย', category:'verb', level:'king', desc:'รับประทานอาหาร เช่น "พระบาทสมเด็จพระเจ้าอยู่หัวเสวยพระกระยาหารเช้าเวลาเจ็ดนาฬิกา"'},
+  {id:16, common:'นอน', royal:'บรรทม', category:'verb', level:'king', desc:'การนอนหลับ เช่น "พระองค์เสด็จเข้าที่บรรทมแต่หัวค่ำ"'},
+  {id:17, common:'พูด', royal:'มีพระราชดำรัส', category:'verb', level:'king', desc:'การพูดหรือกล่าว เช่น "พระองค์ทรงมีพระราชดำรัสแก่ประชาชนในโอกาสวันเฉลิมพระชนมพรรษา"'},
+  {id:18, common:'ไป', royal:'เสด็จพระราชดำเนิน', category:'verb', level:'king', desc:'การเดินทางไป เช่น "สมเด็จพระราชินีเสด็จพระราชดำเนินไปทรงเปิดโรงพยาบาลแห่งใหม่"'},
+  {id:19, common:'ดู', royal:'ทอดพระเนตร', category:'verb', level:'king', desc:'การมองดู เช่น "พระองค์ทรงทอดพระเนตรนิทรรศการด้วยความสนพระทัย"'},
+  {id:20, common:'ฟัง', royal:'ทรงสดับ', category:'verb', level:'high', desc:'การรับฟัง เช่น "สมเด็จเจ้าฟ้าฯ ทรงสดับรายงานความคืบหน้าของโครงการ"'},
+  {id:21, common:'หัวเราะ', royal:'ทรงพระสรวล', category:'verb', level:'king', desc:'การหัวเราะ เช่น "พระองค์ทรงพระสรวลอย่างพระทัยเบิกบานเมื่อทอดพระเนตรการแสดง"'},
+  {id:22, common:'ร้องไห้', royal:'ทรงพระกันแสง', category:'verb', level:'high', desc:'การร้องไห้ เช่น "พระองค์ทรงพระกันแสงด้วยความสงสารราษฎรที่ประสบอุทกภัย"'},
+  {id:23, common:'นั่ง/อยู่', royal:'ประทับ', category:'verb', level:'king', desc:'การนั่งหรืออยู่ ณ ที่ใดที่หนึ่ง เช่น "พระองค์เสด็จออกประทับ ณ พระที่นั่งอมรินทรวินิจฉัย"'},
+  {id:24, common:'อาบน้ำ', royal:'สรงน้ำ', category:'verb', level:'king', desc:'การอาบน้ำ เช่น "พระองค์เสด็จฯ ไปสรงน้ำ ณ พระตำหนักส่วนพระองค์"'},
+  {id:25, common:'อ่าน/เขียนหนังสือ', royal:'ทรงพระอักษร', category:'verb', level:'king', desc:'การอ่านหรือเขียนหนังสือ เช่น "ยามว่างพระองค์โปรดทรงพระอักษรอยู่เสมอ"'},
+  {id:26, common:'ป่วย', royal:'ประชวร', category:'verb', level:'king', desc:'การเจ็บป่วย เช่น "แพทย์หลวงถวายการรักษาเมื่อพระองค์ทรงพระประชวร"'},
+  {id:27, common:'ให้', royal:'พระราชทาน', category:'verb', level:'king', desc:'การให้จากเบื้องบนสู่เบื้องล่าง เช่น "พระองค์พระราชทานปริญญาบัตรแก่บัณฑิตทุกคน"'},
+  {id:28, common:'โกรธ', royal:'ทรงพระพิโรธ', category:'verb', level:'high', desc:'ความโกรธ เช่น "แม้จะทรงพระพิโรธ พระองค์ก็มิได้แสดงออกทางสีพระพักตร์"'},
+  {id:29, common:'เกิด (พระมหากษัตริย์/พระราชินี)', royal:'พระราชสมภพ', category:'verb', level:'king', desc:'การเกิดของพระมหากษัตริย์หรือพระราชินี เช่น "วันพระราชสมภพของพระองค์ตรงกับวันจันทร์"'},
+  {id:30, common:'เกิด (เจ้านายทั่วไป)', royal:'ประสูติ', category:'verb', level:'high', desc:'การเกิดของเจ้านายตั้งแต่ระดับพระองค์เจ้าขึ้นไป เช่น "พระองค์เจ้าพระองค์นี้ประสูติแต่พระบรมราชชนนี"'},
+  {id:31, common:'ตาย (พระมหากษัตริย์/พระราชินี)', royal:'สวรรคต', category:'verb', level:'king', desc:'การถึงแก่ความตายของพระมหากษัตริย์/พระราชินี ใช้แสดงความแตกต่างจากคำว่า "ทิวงคต" และ "สิ้นชีพิตักษัย" ในระดับรองลงมา'},
+  {id:32, common:'ตาย (สมเด็จเจ้าฟ้า)', royal:'ทิวงคต', category:'verb', level:'high', desc:'การถึงแก่ความตายของสมเด็จเจ้าฟ้า เช่น "พระราชพิธีพระราชทานเพลิงพระศพจัดขึ้นหลังการทิวงคต"'},
+  {id:33, common:'ตาย (หม่อมเจ้า)', royal:'สิ้นชีพิตักษัย', category:'verb', level:'minor', desc:'การถึงแก่ความตายของหม่อมเจ้า เช่น "ท่านสิ้นชีพิตักษัยด้วยพระชันษา 80 ปี"'},
+
+  // ---------- หมวดเครื่องใช้/ของใช้ส่วนพระองค์ (item) ----------
+  {id:34, common:'บ้าน/ที่อยู่', royal:'พระตำหนัก', category:'item', level:'king', desc:'สถานที่ประทับส่วนพระองค์ เช่น "พระองค์เสด็จฯ กลับไปประทับ ณ พระตำหนักส่วนพระองค์"'},
+  {id:35, common:'วัง', royal:'พระราชวัง', category:'item', level:'king', desc:'ที่ประทับขนาดใหญ่ของพระมหากษัตริย์ เช่น "พระราชวังเปิดให้ประชาชนเข้าชมในบางโอกาส"'},
+  {id:36, common:'รถ', royal:'รถยนต์พระที่นั่ง', category:'item', level:'king', desc:'ยานพาหนะสำหรับพระมหากษัตริย์/พระราชวงศ์ เช่น "รถยนต์พระที่นั่งเคลื่อนผ่านท่ามกลางเสียงโห่ร้องถวายพระพร"'},
+  {id:37, common:'เรือ', royal:'เรือพระที่นั่ง', category:'item', level:'king', desc:'เรือสำหรับพระมหากษัตริย์/พระราชวงศ์ เช่น "เรือพระที่นั่งแล่นอย่างสง่างามในกระบวนพยุหยาตราทางชลมารค"'},
+  {id:38, common:'เสื้อผ้า', royal:'ฉลองพระองค์', category:'item', level:'king', desc:'เครื่องแต่งกาย เช่น "ฉลองพระองค์สีเหลืองสดใสสง่างามในพระราชพิธี"'},
+  {id:39, common:'หมวก', royal:'พระมาลา', category:'item', level:'high', desc:'หมวกสำหรับสวมใส่ เช่น "สมเด็จเจ้าฟ้าฯ ทรงพระมาลาสีขาวในพิธีสวนสนาม"'},
+  {id:40, common:'แว่นตา', royal:'ฉลองพระเนตร', category:'item', level:'king', desc:'แว่นสำหรับสวมตา เช่น "พระองค์ทรงฉลองพระเนตรขณะทรงพระอักษร"'},
+  {id:41, common:'รองเท้า', royal:'ฉลองพระบาท', category:'item', level:'high', desc:'รองเท้า เช่น "ฉลองพระบาทคู่นี้ทำจากหนังคุณภาพดีเป็นพิเศษ"'},
+  {id:42, common:'เตียงนอน', royal:'พระแท่นบรรทม', category:'item', level:'king', desc:'เตียงสำหรับบรรทม เช่น "พระแท่นบรรทมตั้งอยู่ ณ ห้องพระบรรทมชั้นในสุด"'},
+  {id:43, common:'อาหาร', royal:'พระกระยาหาร', category:'item', level:'king', desc:'อาหาร เช่น "ห้องเครื่องต้นจัดเตรียมพระกระยาหารถวายทุกมื้อ"'},
+  {id:44, common:'น้ำดื่ม', royal:'น้ำเสวย', category:'item', level:'king', desc:'น้ำสำหรับดื่ม เช่น "มหาดเล็กจัดเตรียมน้ำเสวยไว้ในพระที่นั่งเสมอ"'},
+  {id:45, common:'ยา', royal:'พระโอสถ', category:'item', level:'king', desc:'ยารักษาโรค เช่น "แพทย์หลวงปรุงพระโอสถถวายเมื่อทรงพระประชวร"'},
+  {id:46, common:'ร่ม', royal:'พระกลด', category:'item', level:'high', desc:'ร่มขนาดใหญ่กางกั้นแดดฝน เช่น "มหาดเล็กกางพระกลดถวายขณะเสด็จออกกลางแจ้ง"'},
+
+  // ---------- หมวดญาติ/ครอบครัว (family) ----------
+  {id:47, common:'พ่อ (ของพระมหากษัตริย์)', royal:'พระราชบิดา', category:'family', level:'king', desc:'บิดาของพระมหากษัตริย์ เช่น "พระราชบิดาทรงอบรมสั่งสอนพระองค์มาตั้งแต่ทรงพระเยาว์"'},
+  {id:48, common:'แม่ (ของพระมหากษัตริย์)', royal:'พระราชมารดา', category:'family', level:'king', desc:'มารดาของพระมหากษัตริย์ เช่น "พระราชมารดาทรงห่วงใยพระองค์อยู่เสมอ"'},
+  {id:49, common:'พ่อ (ของเจ้าฟ้า/พระองค์เจ้า)', royal:'พระบิดา', category:'family', level:'high', desc:'บิดาของเจ้านายชั้นเจ้าฟ้า/พระองค์เจ้า ใช้ต่างจาก "พระราชบิดา" ที่ใช้เฉพาะบิดาของพระมหากษัตริย์'},
+  {id:50, common:'แม่ (ของเจ้าฟ้า/พระองค์เจ้า)', royal:'พระมารดา', category:'family', level:'high', desc:'มารดาของเจ้านายชั้นเจ้าฟ้า/พระองค์เจ้า เช่น "พระมารดาทรงเลี้ยงดูพระโอรสด้วยพระองค์เอง"'},
+  {id:51, common:'พ่อ (ของหม่อมเจ้า)', royal:'บิดา', category:'family', level:'minor', desc:'บิดาของหม่อมเจ้า ใช้คำใกล้เคียงคำสามัญมากขึ้นตามระดับชั้นที่ลดหลั่นลง'},
+  {id:52, common:'แม่ (ของหม่อมเจ้า)', royal:'มารดา', category:'family', level:'minor', desc:'มารดาของหม่อมเจ้า เช่น "มารดาของท่านชายเป็นหม่อมห้ามในราชสกุล"'},
+  {id:53, common:'ลูกชาย', royal:'พระราชโอรส', category:'family', level:'king', desc:'บุตรชายของพระมหากษัตริย์ เช่น "พระราชโอรสพระองค์ใหญ่ทรงศึกษาอยู่ต่างประเทศ"'},
+  {id:54, common:'ลูกสาว', royal:'พระราชธิดา', category:'family', level:'king', desc:'บุตรสาวของพระมหากษัตริย์ เช่น "พระราชธิดาตามเสด็จพระราชบิดาไปทุกหนแห่ง"'},
+  {id:55, common:'พี่ชาย', royal:'พระเชษฐา', category:'family', level:'high', desc:'พี่ชาย เช่น "พระเชษฐาทรงพาพระอนุชาไปทอดพระเนตรพิพิธภัณฑ์"'},
+  {id:56, common:'พี่สาว', royal:'พระเชษฐภคินี', category:'family', level:'high', desc:'พี่สาว เช่น "พระเชษฐภคินีประทานของขวัญวันเกิดแก่พระขนิษฐา"'},
+  {id:57, common:'น้องชาย', royal:'พระอนุชา', category:'family', level:'high', desc:'น้องชาย เช่น "พระอนุชาตามเสด็จพระเชษฐาไปทุกแห่งหน"'},
+  {id:58, common:'น้องสาว', royal:'พระขนิษฐา', category:'family', level:'high', desc:'น้องสาว เช่น "พระขนิษฐาทรงเล่นดนตรีถวายพระเชษฐาในงานฉลอง"'},
+  {id:59, common:'ปู่/ตา', royal:'พระอัยกา', category:'family', level:'king', desc:'ปู่หรือตา เช่น "พระอัยกาทรงเป็นแบบอย่างที่ดีแก่พระราชนัดดา"'},
+  {id:60, common:'หลาน', royal:'พระราชนัดดา', category:'family', level:'king', desc:'หลานของพระมหากษัตริย์ เช่น "พระราชนัดดาทั้งสองพระองค์ทรงซุกซนน่ารัก"'},
+];
+
+const CATEGORY_LABELS = {
+  body:'ร่างกาย', verb:'กริยา/การกระทำ', item:'เครื่องใช้ส่วนพระองค์', family:'ญาติ/ครอบครัว'
+};
+const LEVEL_LABELS = {
+  king:'พระมหากษัตริย์/พระราชินี', high:'พระบรมวงศานุวงศ์ชั้นสูง', minor:'พระอนุวงศ์'
+};
+
+/* =============================================================
+   สถานะแอป (state) + การจัดเก็บลง localStorage
+   ============================================================= */
+const STORAGE_KEY = 'rajasap_progress_v1';
+const THEME_KEY = 'rajasap_theme_v1';
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* ข้อมูลเสีย จะเริ่มใหม่ */ }
+  return { seenIds:[], quizHistory:[], matchTimes:[] };
+}
+function saveProgress(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+  catch(e){ /* localStorage ใช้งานไม่ได้ (เช่น โหมดส่วนตัว) ข้อมูลจะยังใช้ได้แต่ไม่บันทึกถาวร */ }
+}
+let progress = loadProgress();
+
+const filters = {
+  categories: new Set(Object.keys(CATEGORY_LABELS)),
+  levels: new Set(Object.keys(LEVEL_LABELS)),
+  search: ''
+};
+
+function getPool(){
+  const q = filters.search.trim();
+  return VOCAB_DATA.filter(w =>
+    filters.categories.has(w.category) &&
+    filters.levels.has(w.level) &&
+    (!q || w.common.includes(q) || w.royal.includes(q))
+  );
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function sample(arr, n){ return shuffle(arr).slice(0, n); }
+
+/* =============================================================
+   การสลับโหมดมืด/สว่าง
+   ============================================================= */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').setAttribute('aria-pressed', theme==='dark');
+  document.getElementById('themeIcon').textContent = theme==='dark' ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = theme==='dark' ? 'โหมดสว่าง' : 'โหมดมืด';
+}
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(e){ /* ไม่มีสิทธิ์เข้าถึง localStorage */ }
+  const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+  applyTheme(theme);
+})();
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){ /* ไม่มีสิทธิ์เข้าถึง localStorage */ }
+});
+
+/* =============================================================
+   แถบตัวกรอง + ค้นหา
+   ============================================================= */
+function buildChips(containerId, labelMap, setRef){
+  const el = document.getElementById(containerId);
+  el.innerHTML = Object.entries(labelMap).map(([key,label])=>
+    `<button type="button" class="chip" data-key="${key}" aria-pressed="${setRef.has(key)}">${label}</button>`
+  ).join('');
+  el.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const key = chip.dataset.key;
+      if(setRef.has(key)){
+        if(setRef.size > 1) setRef.delete(key); // กันไม่ให้เลือกว่างจนไม่เหลือคำเลย
+      } else {
+        setRef.add(key);
+      }
+      chip.setAttribute('aria-pressed', setRef.has(key));
+      onFiltersChanged();
+    });
+  });
+}
+buildChips('categoryChips', CATEGORY_LABELS, filters.categories);
+buildChips('levelChips', LEVEL_LABELS, filters.levels);
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', ()=>{
+  filters.search = searchInput.value;
+  onFiltersChanged();
+});
+document.getElementById('clearSearchBtn').addEventListener('click', ()=>{
+  searchInput.value = '';
+  filters.search = '';
+  onFiltersChanged();
+  searchInput.focus();
+});
+
+function updatePoolCount(){
+  const n = getPool().length;
+  document.getElementById('poolCount').innerHTML =
+    `พบ <strong>${n}</strong> คำ จากทั้งหมด ${VOCAB_DATA.length} คำ ตามเงื่อนไขปัจจุบัน`;
+}
+
+function onFiltersChanged(){
+  updatePoolCount();
+  if(currentMode === 'flashcard') fcResetPool();
+  if(currentMode === 'quiz' && !quizState.active) refreshQuizSetup();
+  if(currentMode === 'match' && !matchState.active) refreshMatchSetup();
+}
+
+function setFilterBarEnabled(enabled){
+  document.getElementById('filterBar').style.opacity = enabled ? '1' : '.5';
+  document.getElementById('filterBar').style.pointerEvents = enabled ? 'auto' : 'none';
+}
+
+/* =============================================================
+   การสลับแท็บ/โหมด
+   ============================================================= */
+let currentMode = 'flashcard';
+const tabButtons = document.querySelectorAll('.tab-btn');
+tabButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=> switchMode(btn.dataset.mode));
+});
+function switchMode(mode){
+  currentMode = mode;
+  tabButtons.forEach(b=> b.setAttribute('aria-selected', b.dataset.mode===mode));
+  document.querySelectorAll('[data-view]').forEach(v=>{
+    v.classList.toggle('hidden', v.id !== `view-${mode}`);
+  });
+  setFilterBarEnabled(!(mode==='quiz' && quizState.active) && !(mode==='match' && matchState.active));
+  if(mode==='flashcard') fcResetPool();
+  if(mode==='quiz') refreshQuizSetup();
+  if(mode==='match') refreshMatchSetup();
+  if(mode==='stats') renderStats();
+}
+
+/* =============================================================
+   โหมดการ์ดพลิก (Flashcard)
+   ============================================================= */
+const fcState = { pool:[], index:0, flipped:false };
+const flashcardEl = document.getElementById('flashcard');
+const flashcardInner = document.getElementById('flashcardInner');
+
+function fcResetPool(){
+  fcState.pool = getPool();
+  fcState.index = 0;
+  fcState.flipped = false;
+  flashcardEl.classList.remove('flipped');
+  fcRender();
+}
+function fcRender(){
+  const empty = document.getElementById('fcEmpty');
+  const hasCards = fcState.pool.length > 0;
+  empty.classList.toggle('hidden', hasCards);
+  flashcardEl.classList.toggle('hidden', !hasCards);
+  document.querySelector('.fc-controls').classList.toggle('hidden', !hasCards);
+  if(!hasCards) return;
+
+  const w = fcState.pool[fcState.index];
+  document.getElementById('fcFrontWord').textContent = w.common;
+  document.getElementById('fcFrontBadges').innerHTML =
+    `<span class="badge">${CATEGORY_LABELS[w.category]}</span><span class="badge gold">${LEVEL_LABELS[w.level]}</span>`;
+  document.getElementById('fcBackWord').textContent = w.royal;
+  document.getElementById('fcBackBadges').innerHTML =
+    `<span class="badge">${CATEGORY_LABELS[w.category]}</span><span class="badge gold">${LEVEL_LABELS[w.level]}</span>`;
+  document.getElementById('fcBackDesc').textContent = w.desc;
+  document.getElementById('fcProgress').textContent = `${fcState.index+1}/${fcState.pool.length}`;
+}
+function fcFlip(){
+  if(fcState.pool.length===0) return;
+  fcState.flipped = !fcState.flipped;
+  flashcardEl.classList.toggle('flipped', fcState.flipped);
+  if(fcState.flipped){
+    const id = fcState.pool[fcState.index].id;
+    if(!progress.seenIds.includes(id)){
+      progress.seenIds.push(id);
+      saveProgress();
+    }
+  }
+}
+function fcGo(delta){
+  if(fcState.pool.length===0) return;
+  fcState.index = (fcState.index + delta + fcState.pool.length) % fcState.pool.length;
+  fcState.flipped = false;
+  flashcardEl.classList.remove('flipped');
+  fcRender();
+}
+flashcardEl.addEventListener('click', fcFlip);
+flashcardEl.addEventListener('keydown', e=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); fcFlip(); }
+});
+document.getElementById('fcPrevBtn').addEventListener('click', ()=> fcGo(-1));
+document.getElementById('fcNextBtn').addEventListener('click', ()=> fcGo(1));
+document.getElementById('fcShuffleBtn').addEventListener('click', ()=>{
+  fcState.pool = shuffle(fcState.pool);
+  fcState.index = 0;
+  fcState.flipped = false;
+  flashcardEl.classList.remove('flipped');
+  fcRender();
+});
+
+/* =============================================================
+   โหมดแบบทดสอบ (Quiz)
+   ============================================================= */
+const quizState = { active:false, questions:[], index:0, score:0, answered:false, wrongList:[] };
+
+function refreshQuizSetup(){
+  document.getElementById('quizSetup').classList.remove('hidden');
+  document.getElementById('quizPlay').classList.add('hidden');
+  document.getElementById('quizResult').classList.add('hidden');
+  const pool = getPool();
+  const select = document.getElementById('quizCountSelect');
+  const options = [5,10,15,20].filter(n=> n <= pool.length);
+  if(options.length===0 && pool.length>0) options.push(pool.length);
+  select.innerHTML = options.map(n=>`<option value="${n}">${n} ข้อ</option>`).join('');
+  const enoughWords = pool.length >= 4;
+  document.getElementById('quizWarning').classList.toggle('hidden', enoughWords);
+  document.getElementById('quizStartBtn').disabled = !enoughWords;
+}
+document.getElementById('quizStartBtn').addEventListener('click', startQuiz);
+document.getElementById('quizRetryBtn').addEventListener('click', ()=>{ refreshQuizSetup(); });
+document.getElementById('quizBackBtn').addEventListener('click', ()=>{ refreshQuizSetup(); });
+
+function startQuiz(){
+  const pool = getPool();
+  const count = Number(document.getElementById('quizCountSelect').value) || Math.min(10, pool.length);
+  const chosen = sample(pool, count);
+  quizState.questions = chosen.map(w=>{
+    const sameCategory = pool.filter(x=> x.category===w.category && x.id!==w.id);
+    let distractors = sample(sameCategory, 3);
+    if(distractors.length < 3){
+      const rest = VOCAB_DATA.filter(x=> x.id!==w.id && !distractors.includes(x));
+      distractors = distractors.concat(sample(rest, 3-distractors.length));
+    }
+    const opts = shuffle([w, ...distractors]);
+    return { word:w, options:opts };
+  });
+  quizState.active = true;
+  quizState.index = 0;
+  quizState.score = 0;
+  quizState.wrongList = [];
+  setFilterBarEnabled(false);
+  document.getElementById('quizSetup').classList.add('hidden');
+  document.getElementById('quizResult').classList.add('hidden');
+  document.getElementById('quizPlay').classList.remove('hidden');
+  document.getElementById('quizTotal').textContent = quizState.questions.length;
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  quizState.answered = false;
+  const q = quizState.questions[quizState.index];
+  document.getElementById('quizIndex').textContent = quizState.index+1;
+  document.getElementById('quizScore').textContent = quizState.score;
+  document.getElementById('quizQuestion').textContent = `คำราชาศัพท์ของคำว่า "${q.word.common}" คือข้อใด?`;
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('quizNextBtn').classList.add('hidden');
+  const optWrap = document.getElementById('quizOptions');
+  optWrap.innerHTML = q.options.map(opt=>
+    `<button type="button" class="opt-btn" data-id="${opt.id}">${opt.royal}</button>`
+  ).join('');
+  optWrap.querySelectorAll('.opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> answerQuiz(btn, q));
+  });
+}
+function answerQuiz(btn, q){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  const chosenId = Number(btn.dataset.id);
+  const correct = chosenId === q.word.id;
+  const feedback = document.getElementById('quizFeedback');
+  document.querySelectorAll('#quizOptions .opt-btn').forEach(b=>{
+    b.disabled = true;
+    if(Number(b.dataset.id) === q.word.id) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+  if(correct){
+    quizState.score++;
+    feedback.textContent = '✅ ถูกต้อง!';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    feedback.textContent = `❌ ยังไม่ถูก คำตอบที่ถูกคือ "${q.word.royal}"`;
+    feedback.className = 'quiz-feedback wrong';
+    quizState.wrongList.push({ common:q.word.common, chosen:q.options.find(o=>o.id===chosenId)?.royal || '-', correct:q.word.royal });
+  }
+  document.getElementById('quizScore').textContent = quizState.score;
+  const nextBtn = document.getElementById('quizNextBtn');
+  nextBtn.textContent = (quizState.index === quizState.questions.length-1) ? 'ดูผลคะแนน →' : 'ข้อถัดไป →';
+  nextBtn.classList.remove('hidden');
+  nextBtn.focus();
+}
+document.getElementById('quizNextBtn').addEventListener('click', ()=>{
+  quizState.index++;
+  if(quizState.index >= quizState.questions.length){
+    finishQuiz();
+  } else {
+    renderQuizQuestion();
+  }
+});
+function finishQuiz(){
+  quizState.active = false;
+  setFilterBarEnabled(true);
+  const total = quizState.questions.length;
+  const pct = Math.round((quizState.score/total)*100);
+  progress.quizHistory.push({ date:new Date().toISOString(), score:quizState.score, total });
+  saveProgress();
+  document.getElementById('quizPlay').classList.add('hidden');
+  document.getElementById('quizResult').classList.remove('hidden');
+  document.getElementById('quizResultScore').textContent = `${quizState.score}/${total} (${pct}%)`;
+  let msg = 'ฝึกฝนต่อไปนะคะ ราชาศัพท์ต้องอาศัยความคุ้นเคย 💪';
+  if(pct>=90) msg = 'ยอดเยี่ยมมาก! แม่นราชาศัพท์สุด ๆ 🎉';
+  else if(pct>=70) msg = 'เก่งมาก ใกล้เต็มแล้ว! 👏';
+  else if(pct>=50) msg = 'ทำได้ดี ลองทบทวนคำที่พลาดอีกนิด 🙂';
+  document.getElementById('quizResultMsg').textContent = msg;
+  document.getElementById('quizReviewList').innerHTML = quizState.wrongList.length===0
+    ? '<p style="color:var(--success)">🎯 ตอบถูกทุกข้อ ไม่มีคำที่ต้องทบทวน!</p>'
+    : quizState.wrongList.map(item=>
+        `<div class="review-item bad"><span>${item.common}</span><span>ตอบ: ${item.chosen} → ที่ถูก: <strong>${item.correct}</strong></span></div>`
+      ).join('');
+}
+
+/* =============================================================
+   โหมดจับคู่คำ (Matching)
+   ============================================================= */
+const matchState = { active:false, pairs:[], matchedIds:new Set(), selLeft:null, selRight:null, timerHandle:null, startTime:0 };
+
+function refreshMatchSetup(){
+  document.getElementById('matchSetup').classList.remove('hidden');
+  document.getElementById('matchPlay').classList.add('hidden');
+  document.getElementById('matchDone').classList.add('hidden');
+  const pool = getPool();
+  const select = document.getElementById('matchCountSelect');
+  const options = [4,6,8,10,12].filter(n=> n <= pool.length);
+  if(options.length===0 && pool.length>0) options.push(pool.length);
+  select.innerHTML = options.map(n=>`<option value="${n}">${n} คู่</option>`).join('');
+  const enough = pool.length >= 4;
+  document.getElementById('matchWarning').classList.toggle('hidden', enough);
+  document.getElementById('matchStartBtn').disabled = !enough;
+}
+document.getElementById('matchStartBtn').addEventListener('click', startMatch);
+document.getElementById('matchAgainBtn').addEventListener('click', refreshMatchSetup);
+document.getElementById('matchBackBtn').addEventListener('click', refreshMatchSetup);
+
+function startMatch(){
+  const pool = getPool();
+  const count = Number(document.getElementById('matchCountSelect').value) || Math.min(8, pool.length);
+  matchState.pairs = sample(pool, count);
+  matchState.matchedIds = new Set();
+  matchState.selLeft = null;
+  matchState.selRight = null;
+  matchState.active = true;
+  matchState.startTime = Date.now();
+  setFilterBarEnabled(false);
+  document.getElementById('matchSetup').classList.add('hidden');
+  document.getElementById('matchDone').classList.add('hidden');
+  document.getElementById('matchPlay').classList.remove('hidden');
+  renderMatchGrid();
+  clearInterval(matchState.timerHandle);
+  matchState.timerHandle = setInterval(updateMatchTimer, 1000);
+  updateMatchTimer();
+}
+function formatTime(totalSeconds){
+  const m = Math.floor(totalSeconds/60), s = totalSeconds%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function updateMatchTimer(){
+  const secs = Math.floor((Date.now()-matchState.startTime)/1000);
+  document.getElementById('matchTimer').textContent = formatTime(secs);
+}
+function renderMatchGrid(){
+  const leftOrder = shuffle(matchState.pairs);
+  const rightOrder = shuffle(matchState.pairs);
+  const grid = document.getElementById('matchGrid');
+  grid.innerHTML = `
+    <div class="match-col" id="matchLeftCol"></div>
+    <div class="match-col" id="matchRightCol"></div>
+  `;
+  const leftCol = document.getElementById('matchLeftCol');
+  const rightCol = document.getElementById('matchRightCol');
+  leftOrder.forEach(w=>{
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'match-tile'; b.dataset.id = w.id; b.dataset.side='left';
+    b.textContent = w.common;
+    b.addEventListener('click', ()=> onMatchTileClick(b, w.id, 'left'));
+    leftCol.appendChild(b);
+  });
+  rightOrder.forEach(w=>{
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'match-tile'; b.dataset.id = w.id; b.dataset.side='right';
+    b.textContent = w.royal;
+    b.addEventListener('click', ()=> onMatchTileClick(b, w.id, 'right'));
+    rightCol.appendChild(b);
+  });
+  updateMatchProgress();
+}
+function updateMatchProgress(){
+  document.getElementById('matchProgress').textContent =
+    `จับคู่แล้ว ${matchState.matchedIds.size}/${matchState.pairs.length} คู่`;
+}
+function onMatchTileClick(btn, id, side){
+  if(matchState.matchedIds.has(id)) return;
+  const grid = document.getElementById('matchGrid');
+  if(side==='left'){
+    grid.querySelectorAll('[data-side="left"]').forEach(t=> t.classList.remove('selected'));
+    btn.classList.add('selected');
+    matchState.selLeft = id;
+  } else {
+    grid.querySelectorAll('[data-side="right"]').forEach(t=> t.classList.remove('selected'));
+    btn.classList.add('selected');
+    matchState.selRight = id;
+  }
+  if(matchState.selLeft !== null && matchState.selRight !== null){
+    evaluateMatchSelection();
+  }
+}
+function evaluateMatchSelection(){
+  const leftId = matchState.selLeft, rightId = matchState.selRight;
+  const grid = document.getElementById('matchGrid');
+  const leftBtn = grid.querySelector(`[data-side="left"][data-id="${leftId}"]`);
+  const rightBtn = grid.querySelector(`[data-side="right"][data-id="${rightId}"]`);
+  if(leftId === rightId){
+    matchState.matchedIds.add(leftId);
+    [leftBtn, rightBtn].forEach(b=>{ b.classList.remove('selected'); b.classList.add('matched'); b.disabled = true; });
+    matchState.selLeft = null; matchState.selRight = null;
+    updateMatchProgress();
+    if(matchState.matchedIds.size === matchState.pairs.length){
+      finishMatch();
+    }
+  } else {
+    [leftBtn, rightBtn].forEach(b=> b.classList.add('wrong'));
+    setTimeout(()=>{
+      [leftBtn, rightBtn].forEach(b=>{ b.classList.remove('wrong'); b.classList.remove('selected'); });
+      matchState.selLeft = null; matchState.selRight = null;
+    }, 500);
+  }
+}
+function finishMatch(){
+  matchState.active = false;
+  clearInterval(matchState.timerHandle);
+  setFilterBarEnabled(true);
+  const secs = Math.floor((Date.now()-matchState.startTime)/1000);
+  progress.matchTimes.push({ date:new Date().toISOString(), pairs:matchState.pairs.length, seconds:secs });
+  saveProgress();
+  document.getElementById('matchPlay').classList.add('hidden');
+  document.getElementById('matchDone').classList.remove('hidden');
+  document.getElementById('matchDoneTime').textContent = formatTime(secs);
+}
+
+/* =============================================================
+   สถิติ (Stats)
+   ============================================================= */
+function renderStats(){
+  document.getElementById('statTotalWords').textContent = VOCAB_DATA.length;
+  document.getElementById('statSeen').textContent = progress.seenIds.length;
+  document.getElementById('statQuizCount').textContent = progress.quizHistory.length;
+  const avg = progress.quizHistory.length
+    ? Math.round(progress.quizHistory.reduce((s,q)=> s + (q.score/q.total*100), 0) / progress.quizHistory.length)
+    : 0;
+  document.getElementById('statQuizAvg').textContent = `${avg}%`;
+  const best = progress.matchTimes.length
+    ? Math.min(...progress.matchTimes.map(m=>m.seconds))
+    : null;
+  document.getElementById('statMatchBest').textContent = best===null ? '-' : formatTime(best);
+}
+document.getElementById('resetStatsBtn').addEventListener('click', ()=>{
+  if(confirm('ต้องการล้างสถิติทั้งหมด (คำที่เคยดู, ประวัติแบบทดสอบ, เวลาเกมจับคู่) หรือไม่?')){
+    progress = { seenIds:[], quizHistory:[], matchTimes:[] };
+    saveProgress();
+    renderStats();
+  }
+});
+
+/* =============================================================
+   เริ่มต้นแอป
+   ============================================================= */
+updatePoolCount();
+fcResetPool();
+refreshQuizSetup();
+refreshMatchSetup();
+</script>
+</body>
+</html>
